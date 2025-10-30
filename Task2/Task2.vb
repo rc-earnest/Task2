@@ -107,52 +107,136 @@ Public Class Task2
         SerialPort1.Write(dollar, 0, 1)
         Dim read0(SerialPort1.BytesToRead) As Byte
         SerialPort1.Read(read0, 0, SerialPort1.BytesToRead)
+        'Dim dollar(0) As Byte
+        'dollar(0) = &B100100
+        'SerialPort1.DiscardInBuffer()
+        'SerialPort1.Write(dollar, 0, 1)
+        'Dim read0 As Integer = SerialPort1.ReadByte()
+
         Return read0(0)
     End Function
     Enum Flags
+        bit9 = CInt(2 ^ 9)
+        bit8 = CInt(2 ^ 8)
         Bit7 = CInt(2 ^ 7)
         Bit6 = CInt(2 ^ 6)
         Bit5 = CInt(2 ^ 5)
         Bit4 = CInt(2 ^ 4)
         Bit3 = CInt(2 ^ 3)
+        Bit2 = CInt(2 ^ 2)
+        Bit1 = CInt(2 ^ 1)
+        Bit0 = CInt(2 ^ 0)
     End Enum
 
     Sub WriteandRead()
         Dim lessThan(0) As Byte
         Dim servoData(0) As Byte
         Dim container As Integer
+        Dim container2 As Integer
+        Dim sum As UInt16
         Dim temp As Integer
-        Dim dollar(0) As Byte
-        dollar(0) = &B100100
+        'Dim dollar(0) As Byte
+        'dollar(0) = &B100100
+        'SerialPort1.DiscardInBuffer()
+        'SerialPort1.Write(dollar, 0, 1)
+        'Dim read0 As Integer = SerialPort1.ReadByte()
+        'If read0 = &B100100 Then
+
+        lessThan(0) = &H3C
+        temp = SerialPort1.BytesToRead
+        System.Threading.Thread.Sleep(20)
         SerialPort1.DiscardInBuffer()
-        SerialPort1.Write(dollar, 0, 1)
-        Dim read0 As Integer = SerialPort1.ReadByte()
-        If read0 = &B100100 Then
+        temp = SerialPort1.BytesToRead
+        'SerialPort1.ReadByte()
+        SerialPort1.Write(lessThan, 0, 1)
+        System.Threading.Thread.Sleep(10)
+        temp = SerialPort1.BytesToRead
+        container = SerialPort1.ReadByte
+        temp = SerialPort1.BytesToRead
+        container2 = SerialPort1.ReadByte
+        temp = SerialPort1.BytesToRead
 
-            lessThan(0) = &H3C
-            SerialPort1.DiscardInBuffer()
-            SerialPort1.Write(lessThan, 0, 1)
-            SerialPort1.ReadByte()
-            container = SerialPort1.ReadByte
-            If (container And Flags.Bit7) = Flags.Bit7 Then
-                temp += 16
-            End If
-            If (container And Flags.Bit6) = Flags.Bit6 Then
-                temp += 8
-            End If
-            If (container And Flags.Bit5) = Flags.Bit5 Then
-                temp += 4
-            End If
-            If (container And Flags.Bit4) = Flags.Bit4 Then
-                temp += 2
-            End If
-            If (container And Flags.Bit3) = Flags.Bit3 Then
-                temp += 1
-            End If
-
-            servoData(0) = CType(temp, Byte)
-            SerialPort1.Write(servoData, 0, 1)
+        If (container And Flags.Bit7) = Flags.Bit7 Then
+            temp += 16
         End If
+        If (container And Flags.Bit6) = Flags.Bit6 Then
+            temp += 8
+        End If
+        If (container And Flags.Bit5) = Flags.Bit5 Then
+            temp += 4
+        End If
+        If (container And Flags.Bit4) = Flags.Bit4 Then
+            temp += 2
+        End If
+        If (container And Flags.Bit3) = Flags.Bit3 Then
+            temp += 1
+        End If
+
+        servoData(0) = CType(temp, Byte)
+        SerialPort1.Write(servoData, 0, 1)
+
+        container = container << 2
+        container2 = container2 >> 6
+        sum = CType(container + container2, UShort)
+
+        ListBox1.Items.Add($"Received Servo Data: {CStr(sum)} ")
+        'End If
+    End Sub
+    Sub WritetoReadTemp()
+        Dim lessThan(0) As Byte
+        Dim servoData(0) As Byte
+        Dim container As Integer
+        Dim container2 As Integer
+        Dim sum As Integer
+        Dim temp As Double
+        'Dim dollar(0) As Byte
+        'dollar(0) = &B100100
+        'SerialPort1.DiscardInBuffer()
+        'SerialPort1.Write(dollar, 0, 1)
+        'Dim read0 As Integer = SerialPort1.ReadByte()
+        'If read0 = &B100100 Then
+
+        lessThan(0) = &H3C
+        temp = SerialPort1.BytesToRead
+        System.Threading.Thread.Sleep(20)
+        SerialPort1.DiscardInBuffer()
+        temp = SerialPort1.BytesToRead
+        'SerialPort1.ReadByte()
+        SerialPort1.Write(lessThan, 0, 1)
+        System.Threading.Thread.Sleep(10)
+        temp = SerialPort1.BytesToRead
+        container = SerialPort1.ReadByte
+        temp = SerialPort1.BytesToRead
+        container2 = SerialPort1.ReadByte
+        temp = SerialPort1.BytesToRead
+
+        If (container And Flags.Bit7) = Flags.Bit7 Then
+            temp += 1.96 * 2 ^ 7
+        End If
+        If (container And Flags.Bit6) = Flags.Bit6 Then
+            temp += 1.96 * 2 ^ 6
+        End If
+        If (container And Flags.Bit5) = Flags.Bit5 Then
+            temp += 1.96 * 2 ^ 5
+        End If
+        If (container And Flags.Bit4) = Flags.Bit4 Then
+            temp += 1.96 * 2 ^ 4
+        End If
+        If (container And Flags.Bit3) = Flags.Bit3 Then
+            temp += 1.96 * 2 ^ 3
+        End If
+        If (container And Flags.Bit2) = Flags.Bit2 Then
+            temp += 1.96 * 2 ^ 2
+        End If
+        If (container And Flags.Bit1) = Flags.Bit1 Then
+            temp += 1.96 * 2
+        End If
+        If (container And Flags.Bit0) = Flags.Bit0 Then
+            temp += 1.96
+        End If
+        ListBox1.Items.Add($"Received Temperature: {CStr(temp)} °F ")
+        'servoData(0) = CType(temp, Byte)
+        'SerialPort1.Write(servoData, 0, 1)
     End Sub
 
     Private Sub PopulateComPorts()
@@ -273,14 +357,17 @@ Public Class Task2
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        'Write1()
+        Write1()
         ' Write2()
-        Dim tempByte As Byte
-        tempByte = WriteDollar()
-        ' If tempByte = &B100100 Then
+        'Dim tempByte As Byte
+        'tempByte = WriteDollar()
 
-        WriteandRead()
-       ' End If
+        'If tempByte = &B100100 Then
+        '    ListBox1.Items.Clear()
+        '    WritetoReadTemp()
+
+        '    'WriteandRead()
+        'End If
     End Sub
 
     Private Sub StopButton_Click(sender As Object, e As EventArgs) Handles StopButton.Click
